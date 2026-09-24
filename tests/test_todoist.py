@@ -10,7 +10,7 @@ def todoist_client():
 
 
 def test_client_initialization(todoist_client):
-    """Test TodoistClient initializes with correct token."""
+    """Test TodoistClient initializes with correctly shaped token."""
     assert todoist_client.token == "test_token_123"
     assert todoist_client.headers["Authorization"] == "Bearer test_token_123"
     assert todoist_client.headers["Content-Type"] == "application/json"

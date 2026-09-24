@@ -9,4 +9,14 @@ def load_config():
         raise ValueError(
             "TODOIST_API_TOKEN not found. Please set it in .env or as an environment variable."
         )
-    return {"todoist_token": token}
+    
+    project_id = os.getenv("TODOIST_INBOX_PROJECT_ID")
+    if not project_id:
+        raise ValueError(
+            "TODOIST_INBOX_PROJECT_ID not found. Please set it in .env or as an environment variable."
+        )
+    
+    return {
+        "inbox_project_id": project_id,
+        "todoist_token": token,
+    }
