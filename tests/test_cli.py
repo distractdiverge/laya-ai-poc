@@ -11,12 +11,21 @@ runner = CliRunner()
 @pytest.fixture
 def mock_config():
     """Mock config loading."""
-    return {"todoist_token": "test_token"}
+    return {"todoist_token": "test_token", "inbox_project_id": "inbox_123"}
+
+
+@pytest.fixture
+def mock_task_objects():
+    """Mock Task objects with to_dict() method."""
+    return [
+        Mock(to_dict=Mock(return_value={"id": "1", "content": "Task 1"})),
+        Mock(to_dict=Mock(return_value={"id": "2", "content": "Task 2"})),
+    ]
 
 
 @pytest.fixture
 def mock_tasks():
-    """Mock task data."""
+    """Mock task data (dict format for state/categorize tests)."""
     return [
         {"id": "1", "content": "Task 1"},
         {"id": "2", "content": "Task 2"},
@@ -33,12 +42,12 @@ def test_cli_help():
     assert "status" in result.stdout
 
 
-def test_fetch_success(mock_config, mock_tasks):
+def test_fetch_success(mock_config, mock_task_objects):
     """Test successful fetch command."""
     with patch("laya_ai.cli.load_config", return_value=mock_config):
         with patch("laya_ai.cli.TodoistClient") as mock_client_class:
             mock_client = Mock()
-            mock_client.get_tasks.return_value = mock_tasks
+            mock_client.get_tasks.return_value = mock_task_objects
             mock_client_class.return_value = mock_client
 
             with patch("laya_ai.cli.state_store.update_tasks"):
@@ -46,7 +55,7 @@ def test_fetch_success(mock_config, mock_tasks):
 
                 assert result.exit_code == 0
                 assert "Fetching tasks" in result.stdout
-                assert f"Fetched {len(mock_tasks)} tasks" in result.stdout
+                assert f"Fetched {len(mock_task_objects)} tasks" in result.stdout
 
 
 def test_fetch_missing_token():
@@ -186,16 +195,16 @@ def test_status_counts_uncategorized():
         assert "Uncategorized: 2" in result.stdout
 
 
-def test_fetch_command_calls_todoist_client(mock_config, mock_tasks):
-    """Test that fetch creates a TodoistClient with correct token."""
+def test_fetch_command_calls_todoist_client(mock_config, mock_task_objects):
+    """Test that fetch creates a TodoistClient with correct token and project_id."""
     with patch("laya_ai.cli.load_config", return_value=mock_config):
         with patch("laya_ai.cli.TodoistClient") as mock_client_class:
             mock_client = Mock()
-            mock_client.get_tasks.return_value = mock_tasks
+            mock_client.get_tasks.return_value = mock_task_objects
             mock_client_class.return_value = mock_client
 
             with patch("laya_ai.cli.state_store.update_tasks"):
                 runner.invoke(app, ["fetch"])
 
                 mock_client_class.assert_called_once_with(mock_config["todoist_token"])
-                mock_client.get_tasks.assert_called_once()
+                mock_client.get_tasks.assert_called_once_with(mock_config["inbox_project_id"])

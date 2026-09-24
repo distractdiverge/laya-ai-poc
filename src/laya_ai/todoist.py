@@ -5,16 +5,36 @@ class Project:
     def __init__(self, project: TodoistProject):
         self.id = project.id
         self.name = project.name
+
+    def to_dict(self) -> dict:
+        return {"id": self.id, "name": self.name}
+
+
 class Task:
     def __init__(self, task: TodoistTask):
         self.id = task.id
         self.project_id = task.project_id
-
         self.content = task.content
-        self.due = task.due
         self.is_completed = task.is_completed
         self.labels = task.labels
         self.priority = task.priority
+
+        if task.due is not None:
+            due_date = task.due.date
+            self.due_date = due_date.isoformat() if hasattr(due_date, 'isoformat') else str(due_date)
+        else:
+            self.due_date = None
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "content": self.content,
+            "due_date": self.due_date,
+            "is_completed": self.is_completed,
+            "labels": self.labels,
+            "priority": self.priority,
+        }
         
 
 class TodoistClient:

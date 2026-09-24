@@ -4,6 +4,9 @@ from unittest.mock import Mock, patch
 
 from laya_ai.config import load_config
 from laya_ai.todoist import TodoistClient
+from todoist_api_python.api import TodoistAPI
+
+pytestmark = pytest.mark.integration
 
 
 @pytest.fixture
@@ -23,10 +26,8 @@ def get_inbox_project_id_from_config():
 
 def test_client_initialization(todoist_client):
     """Test TodoistClient initializes with actual token."""
-    expected_token = get_token_from_config()
-    assert todoist_client.token == expected_token
-    assert todoist_client.headers["Authorization"] == f"Bearer {expected_token}"
-    assert todoist_client.headers["Content-Type"] == "application/json"
+    assert todoist_client.api is not None
+    assert isinstance(todoist_client.api, TodoistAPI)
 
 def test_get_projects_success(todoist_client):
     """Test successful retrieval of projects."""

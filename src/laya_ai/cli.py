@@ -20,9 +20,10 @@ def fetch() -> None:
 
     typer.echo("Fetching tasks from Todoist...")
     client = TodoistClient(config["todoist_token"])
-    tasks = client.get_tasks()
-    state_store.update_tasks(tasks)
-    typer.echo(f"Fetched {len(tasks)} tasks.")
+    tasks = client.get_tasks(config["inbox_project_id"])
+    task_dicts = [t.to_dict() for t in tasks]
+    state_store.update_tasks(task_dicts)
+    typer.echo(f"Fetched {len(task_dicts)} tasks.")
 
 
 @app.command("categorize")
