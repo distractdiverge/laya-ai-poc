@@ -10,6 +10,7 @@ requires-python = ">=3.12"
 dependencies = [
     "python-dotenv>=1.2.3",
     "todoist-api-python>=3.1.0,<4",
+    "laya>=0.3.20,<1",
     "typer>=0.27.2",
 ]
 

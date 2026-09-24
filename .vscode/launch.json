@@ -4,11 +4,21 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
+
         {
-            "name": "Python Debugger: Python File",
+            "name": "Debug: Python Test",
             "type": "debugpy",
             "request": "launch",
             "purpose": ["debug-test"],
+            "python": "${workspaceFolder}/.venv/bin/python",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Debug Python File",
+            "type": "debugpy",
+            "request": "launch",
             "python": "${workspaceFolder}/.venv/bin/python",
             "console": "integratedTerminal",
             "justMyCode": false
