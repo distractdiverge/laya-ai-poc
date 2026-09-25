@@ -1,35 +1,56 @@
 from laya import Router
+from laya_ai.categories import categories
 import json
+
+
+# TODO: Seperate out downloading model from runtime usage (allow & prevent downloading model)
+#
+# # Or specify cache_dir when loading
+# agent = laya.load(
+#    "convaiinnovations/laya",
+#    cache_dir="/specific/path"
+#)#
+#If you want checkpoints as standalone directories you can version, ship in a container, or air-gap manually:
+# # Snapshot just one checkpoint into its own folder
+# huggingface-cli download convaiinnovations/laya \
+#     --include "multilingual/*" \
+#     --local-dir ./models/laya-multilingual \
+#     --local-dir-use-symlinks False
+# Then load from the local path instead of the Hub — no network at all:
+# import laya
+
+# agent_ml = laya.load("./models/laya-multilingual")
+# 
+# 
+
 
 router = Router()
 
-state = "Hi, we were billed twice! for the same service. Help resolve this, otherwise I will cancel! Take a look at my cat!"
+# Get inbox tasks (as 'state'(s))
+
+
+tasks = ["Submit homestead paperwork", "Find vet for shadow", "Buy milk", "clean up porch", "Winterize houseplants", "Plan life"]
 
 questions = {
-    "departments": { 
+    "priority": {
         "type": "choice",
-        "instructions": "Which department should handle this issue?",
+        "instructions": "What is the relative priority of this task?",
         "criteria": {
-            "billing": "invoices, payments, refunds",
-            "technical": "bugs, outages, system errors",
-            "other": "everything else"
+            "p1": "This is the most important item.",
+            "p2": "Not the top priority, but needs to be done.",
+            "p3": "Good thing to help improve things.",
+            "p4": "Get to it when there is free time.",
         }
     },
-    "urgency": {
-    "type": "score",
-        "instructions": "How urgent is this issue?",
-        "criteria": [
-            "nice-to-have",
-            "not-urgent",
-            "soon",
-            "blocking",
-        ]
-    },
-    "churn_risk": {
+    "category": categories,
+    "is-atomic": {
         "type": "noul",
-        "instructions": "Does the user threaten to cancel their subscription or leave?"
+        "instructions": "Can this task be done in one step, at once without further follow ups?"
     }
 }
-result = router.predict(state, questions)
 
-print(json.dumps(result, indent=4))
+
+for task in tasks:
+    result = router.predict(task, questions)
+    print("## TASK: ", task)
+    print(json.dumps(result, indent=4))
